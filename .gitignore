@@ -1,0 +1,7 @@
+node_modules/
+*.db
+*.db-wal
+*.db-shm
+conduit.db
+.env
+.DS_Store
