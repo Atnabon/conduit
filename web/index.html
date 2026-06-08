@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>conduit — the authorization kernel for AI agents</title>
+    <meta
+      name="description"
+      content="conduit is the trust layer AI agents run on: permissions, scoped capabilities, and a tamper-evident audit log. One small kernel every tool call passes through."
+    />
+    <meta property="og:title" content="conduit — the authorization kernel for AI agents" />
+    <meta
+      property="og:description"
+      content="The permission, capability, and audit layer the agent economy runs on. Open source, MCP-native."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="wordmark" href="/" aria-label="conduit home">
+          <span class="wordmark-mark" aria-hidden="true">⌁</span> conduit
+        </a>
+        <div class="nav-links">
+          <a href="#primitives">Primitives</a>
+          <a href="#discovery">Discovery</a>
+          <a href="#onboarding">Onboarding</a>
+          <a href="#pricing">Pricing</a>
+          <a class="nav-cta" href="https://github.com/conduit-dev/conduit">GitHub</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main">
+      <!-- Hero ------------------------------------------------------------ -->
+      <section class="hero" aria-labelledby="hero-heading">
+        <p class="eyebrow reveal">Software for agents</p>
+        <h1 id="hero-heading" class="reveal">
+          The authorization kernel<br />for <span class="accent">AI agents</span>.
+        </h1>
+        <p class="hero-sub reveal">
+          Agents are starting to <em>act</em> — buy things, move money, change records,
+          manage systems. conduit is the trust layer they run on: permissions, scoped
+          capabilities, and a tamper-evident audit log. One small kernel every tool call
+          passes through.
+        </p>
+
+        <div class="terminal reveal" role="img" aria-label="Terminal showing: bun add conduit">
+          <div class="terminal-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <pre class="terminal-body"><code><span class="prompt">$</span> <span class="cmd">bun add conduit</span>
+<span class="muted">+ conduit@0.1.0 — the authorization kernel for AI agents</span>
+
+<span class="prompt">$</span> <span class="cmd">bun run demo</span>
+<span class="ok">ALLOW</span>  web.search        <span class="muted">· via rule</span>
+<span class="deny">DENY </span>  system.exec       <span class="muted">· host is off-limits</span>
+<span class="ok">ALLOW</span>  payment.charge    <span class="muted">· via capability · $80 / $200</span>
+<span class="ask">ASK  </span>  payment.charge    <span class="muted">· escalated to a human</span>
+<span class="verified">VERIFIED</span> audit chain intact — 12 events</code></pre>
+        </div>
+
+        <div class="hero-cta reveal">
+          <a class="btn btn-primary" href="https://github.com/conduit-dev/conduit">Read the quickstart</a>
+          <a class="btn btn-ghost" href="#primitives">See how it works</a>
+        </div>
+        <p class="hero-meta reveal">Open source · MCP-native · no dashboard required</p>
+      </section>
+
+      <!-- Problem --------------------------------------------------------- -->
+      <section class="band" aria-labelledby="problem-heading">
+        <h2 id="problem-heading" class="reveal">
+          Today, agent authorization is a hardcoded <code>if</code> statement.
+          <span class="dim">Or nothing at all.</span>
+        </h2>
+        <div class="problem-grid">
+          <article class="problem reveal">
+            <h3>Who decided this?</h3>
+            <p>
+              An agent spends $500. Who authorized it, within what limits, and can you
+              prove it later? Right now the answer is buried in application code — or
+              missing entirely.
+            </p>
+          </article>
+          <article class="problem reveal">
+            <h3>No scoped autonomy</h3>
+            <p>
+              An agent either has a credential or it doesn't. There is no standard way to
+              say <em>"up to $200, three times, for one hour, then it expires."</em>
+            </p>
+          </article>
+          <article class="problem reveal">
+            <h3>No provable record</h3>
+            <p>
+              When something goes wrong, logs can be edited. There is no tamper-evident
+              account of what an agent was permitted to do — and did.
+            </p>
+          </article>
+        </div>
+        <p class="band-note reveal">
+          Everyone is building agents. Almost no one is building the software agents
+          depend on to act <strong>safely</strong>. conduit is that software.
+        </p>
+      </section>
+
+      <!-- Primitives ------------------------------------------------------ -->
+      <section id="primitives" class="band" aria-labelledby="primitives-heading">
+        <p class="eyebrow reveal">The kernel</p>
+        <h2 id="primitives-heading" class="reveal">Three primitives. One question.</h2>
+        <p class="band-sub reveal">
+          <em>May this agent take this action, right now?</em> conduit answers it by
+          consulting two layers — and records the verdict in a hash-chained log.
+        </p>
+
+        <div class="cards">
+          <article class="card reveal">
+            <div class="card-num">01</div>
+            <h3>Permissions</h3>
+            <p class="card-lede">Coarse, always-on policy.</p>
+            <pre class="snippet"><code>rules: [
+  { action: <span class="s">'web.*'</span>,     behavior: <span class="ok-t">'allow'</span> },
+  { action: <span class="s">'system.*'</span>,  behavior: <span class="deny-t">'deny'</span>  },
+  { action: <span class="s">'payment.*'</span>, behavior: <span class="ask-t">'ask'</span>   },
+]</code></pre>
+            <p class="card-note"><code>deny</code> always wins. No rule? Falls through to capabilities.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-num">02</div>
+            <h3>Capabilities</h3>
+            <p class="card-lede">Scoped, budgeted, expiring autonomy.</p>
+            <pre class="snippet"><code>conduit.grant({
+  agentId: <span class="s">'agent.shopper'</span>,
+  action:  <span class="s">'payment.charge'</span>,
+  constraints: {
+    budget: { currency: <span class="s">'USD'</span>, limit: <span class="n">200</span> },
+    rateLimit: { maxInvocations: <span class="n">1</span>, windowMs: <span class="n">60000</span> },
+  },
+  expiresAt: Date.now() + <span class="n">3600_000</span>,
+})</code></pre>
+            <p class="card-note">How an agent is trusted to act without a human — safely.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-num">03</div>
+            <h3>Audit</h3>
+            <p class="card-lede">A tamper-evident record of everything.</p>
+            <pre class="snippet"><code><span class="c">// every decision is SHA-256 hash-chained</span>
+conduit.verifyAudit()
+<span class="muted">→ { valid: true, length: 12 }</span>
+
+<span class="c">// alter any past event and</span>
+<span class="c">// every later hash breaks</span></code></pre>
+            <p class="card-note">Tampering is detectable. The record is evidence.</p>
+          </article>
+        </div>
+
+        <div class="oneline reveal">
+          <p>The universal integration — wrap one call around tool execution:</p>
+          <pre class="snippet snippet-wide"><code><span class="k">const</span> outcome = <span class="k">await</span> conduit.<span class="fn">run</span>(
+  { agentId, action: <span class="s">'payment.charge'</span>, input, cost: { currency: <span class="s">'USD'</span>, amount: <span class="n">80</span> } },
+  <span class="k">async</span> () => <span class="fn">actuallyChargeTheCard</span>(input),
+)
+<span class="k">if</span> (outcome.status === <span class="s">'allowed'</span>)        { <span class="c">/* it ran */</span> }
+<span class="k">else if</span> (outcome.status === <span class="s">'needs_approval'</span>) { <span class="c">/* route to a human */</span> }</code></pre>
+        </div>
+      </section>
+
+      <!-- Discovery ------------------------------------------------------- -->
+      <section id="discovery" class="band" aria-labelledby="discovery-heading">
+        <p class="eyebrow reveal">Machine-readable by default</p>
+        <h2 id="discovery-heading" class="reveal">An agent discovers conduit on its own.</h2>
+        <p class="band-sub reveal">
+          Software for agents starts before sign-up: an agent should <em>land on a
+          service and figure out what it can do</em> — with no human reading docs.
+          conduit serves two unauthenticated discovery routes: a
+          <code>.well-known</code> agent manifest and a full OpenAPI 3.1 contract.
+          The manifest carries an ordered, machine-readable onboarding runbook the
+          agent simply follows.
+        </p>
+        <pre class="snippet snippet-wide reveal"><code><span class="prompt">$</span> curl conduit.example.com/.well-known/agent-manifest.json
+
+<span class="muted">{</span>
+  <span class="s">"kind"</span>: <span class="s">"agent-authorization-service"</span>,
+  <span class="s">"onboarding"</span>: { <span class="s">"steps"</span>: [
+    { <span class="s">"step"</span>: <span class="n">1</span>, <span class="s">"name"</span>: <span class="s">"register"</span>,             <span class="s">"path"</span>: <span class="s">"/api/agents"</span> },
+    { <span class="s">"step"</span>: <span class="n">2</span>, <span class="s">"name"</span>: <span class="s">"request a capability"</span>, <span class="s">"path"</span>: <span class="s">"/api/capability-requests"</span> },
+    { <span class="s">"step"</span>: <span class="n">3</span>, <span class="s">"name"</span>: <span class="s">"authorize an action"</span>,  <span class="s">"path"</span>: <span class="s">"/api/authorize"</span> },
+  ] },
+  <span class="s">"documentation"</span>: { <span class="s">"openapi"</span>: <span class="s">"/openapi.json"</span> }
+<span class="muted">}</span></code></pre>
+        <p class="band-note reveal">
+          Both routes stay public even in commercial mode — an agent reads them
+          <strong>before it holds any credential</strong>, then onboards itself.
+        </p>
+      </section>
+
+      <!-- Self-onboarding ------------------------------------------------- -->
+      <section id="onboarding" class="band band-feature" aria-labelledby="onboarding-heading">
+        <div class="feature-grid">
+          <div class="reveal">
+            <p class="eyebrow">No human in the loop</p>
+            <h2 id="onboarding-heading">Agents onboard themselves.</h2>
+            <p class="band-sub">
+              "Software for agents" means an agent can discover a tool, sign up for it,
+              and start using it programmatically. conduit makes that the normal path: an
+              agent registers, gets a token, and requests its own capabilities. Requests
+              inside policy are granted instantly; anything bigger is parked for a human.
+            </p>
+            <ul class="ticks">
+              <li>Self-service registration with hashed, single-issue tokens</li>
+              <li>Policy-bounded auto-approval — budget and rate ceilings</li>
+              <li>Over-policy requests escalate cleanly to human approval</li>
+            </ul>
+          </div>
+          <pre class="snippet snippet-tall reveal"><code><span class="c">// 1. the agent signs itself up</span>
+<span class="k">const</span> { token } = conduit.<span class="fn">registerAgent</span>({
+  agentId: <span class="s">'agent.shopper'</span>,
+})
+
+<span class="c">// 2. it requests its own capability</span>
+<span class="k">const</span> result = conduit.<span class="fn">requestCapability</span>(
+  <span class="s">'agent.shopper'</span>, token,
+  { action: <span class="s">'payment.charge'</span>,
+    constraints: { budget: { currency: <span class="s">'USD'</span>, limit: <span class="n">40</span> } } },
+)
+
+<span class="muted">→ { status: 'granted',  capability }</span>
+<span class="muted">→ { status: 'pending',  approvalId }</span>
+<span class="muted">→ { status: 'rejected', reason }</span></code></pre>
+        </div>
+      </section>
+
+      <!-- MCP ------------------------------------------------------------- -->
+      <section class="band" aria-labelledby="mcp-heading">
+        <p class="eyebrow reveal">Agent-first by construction</p>
+        <h2 id="mcp-heading" class="reveal">conduit is itself software for agents.</h2>
+        <p class="band-sub reveal">
+          Run it as an MCP server and any MCP-capable harness can govern itself —
+          machine-readable, no human, no UI. Eight tools: <code>register_agent</code>,
+          <code>request_capability</code>, <code>authorize</code>,
+          <code>grant_capability</code>, <code>revoke_capability</code>,
+          <code>list_capabilities</code>, <code>get_audit_trail</code>,
+          <code>verify_audit</code>.
+        </p>
+        <pre class="snippet snippet-wide reveal"><code><span class="prompt">$</span> claude mcp add conduit -- bun run /abs/path/to/conduit/mcp/index.ts</code></pre>
+      </section>
+
+      <!-- Pricing --------------------------------------------------------- -->
+      <section id="pricing" class="band" aria-labelledby="pricing-heading">
+        <p class="eyebrow reveal">Pricing</p>
+        <h2 id="pricing-heading" class="reveal">Open-source core. Hosted control plane.</h2>
+        <p class="band-sub reveal">
+          The kernel is MIT-licensed and free forever. Revenue comes from the hosted
+          control plane — metered on the authorization decisions conduit makes for you.
+        </p>
+
+        <div class="plans">
+          <article class="plan reveal">
+            <h3>Free</h3>
+            <p class="price"><span class="price-num">$0</span></p>
+            <p class="plan-quota">10,000 authorizations / mo</p>
+            <p class="plan-blurb">For prototypes and side projects. The full kernel, self-hosted, forever free.</p>
+            <a class="btn btn-ghost btn-block" href="https://github.com/conduit-dev/conduit">Start free</a>
+          </article>
+          <article class="plan plan-featured reveal">
+            <div class="plan-tag">Most popular</div>
+            <h3>Team</h3>
+            <p class="price"><span class="price-num">$99</span><span class="price-per">/ mo</span></p>
+            <p class="plan-quota">1,000,000 authorizations / mo</p>
+            <p class="plan-blurb">For production agents. Hosted control plane, dashboard, and compliance exports.</p>
+            <a class="btn btn-primary btn-block" href="https://github.com/conduit-dev/conduit">Start Team</a>
+          </article>
+          <article class="plan reveal">
+            <h3>Enterprise</h3>
+            <p class="price"><span class="price-num">Custom</span></p>
+            <p class="plan-quota">Unlimited volume</p>
+            <p class="plan-blurb">Unlimited volume, SSO, audit-retention SLAs, and a private deployment option.</p>
+            <a class="btn btn-ghost btn-block" href="https://github.com/conduit-dev/conduit">Contact us</a>
+          </article>
+        </div>
+      </section>
+
+      <!-- Closing --------------------------------------------------------- -->
+      <section class="band closing" aria-labelledby="closing-heading">
+        <h2 id="closing-heading" class="reveal">Okta for agents.</h2>
+        <p class="band-sub reveal">
+          The permission, capability, and audit layer the agent economy runs on.
+        </p>
+        <div class="hero-cta reveal">
+          <a class="btn btn-primary" href="https://github.com/conduit-dev/conduit">Get started</a>
+          <a class="btn btn-ghost" href="#main">Back to top</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p><span aria-hidden="true">⌁</span> conduit — the authorization kernel for AI agents</p>
+      <p class="dim">MIT licensed · built on Bun &amp; TypeScript</p>
+    </footer>
+
+    <script src="/main.js" defer></script>
+  </body>
+</html>
