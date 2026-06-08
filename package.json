@@ -1,0 +1,66 @@
+{
+  "name": "conduit",
+  "version": "0.1.0",
+  "description": "The authorization kernel for AI agents. Permissions, scoped capabilities, a tamper-evident audit trail, and human-free agent onboarding.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "ai-agents",
+    "authorization",
+    "permissions",
+    "capabilities",
+    "audit-log",
+    "mcp",
+    "agent-infrastructure",
+    "software-for-agents"
+  ],
+  "homepage": "https://github.com/conduit-dev/conduit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/conduit-dev/conduit.git"
+  },
+  "main": "./index.ts",
+  "module": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./kernel": "./kernel/index.ts",
+    "./mcp": "./mcp/server.ts",
+    "./control-plane": "./control-plane/api.ts"
+  },
+  "files": [
+    "index.ts",
+    "kernel",
+    "mcp",
+    "control-plane",
+    "README.md",
+    "QUICKSTART.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "scripts": {
+    "demo": "bun run cli/index.ts",
+    "tamper": "bun run cli/tamper.ts",
+    "agent": "bun run examples/governed-agent.ts",
+    "mcp": "bun run mcp/index.ts",
+    "mcp:http": "bun run mcp/http.ts",
+    "control-plane": "bun run control-plane/index.ts",
+    "site": "bun run web/serve.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "chalk": "^5.4.0",
+    "express": "^5.2.1",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/express": "^5.0.6",
+    "typescript": "^5.6.0"
+  }
+}
